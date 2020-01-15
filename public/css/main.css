@@ -60,6 +60,11 @@ main {
 
 .card {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    max-width: 300px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: conter;
+    align-items: center;
 }
 
 .card__header,
@@ -76,6 +81,7 @@ main {
 
 .card__image {
     width: 100%;
+    max-width: 100px;
 }
 
 .card__image img {
