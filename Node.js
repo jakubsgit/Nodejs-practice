@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // We can write app.use('/admin', (adminRoutes)) to have path following by /admin
-app.use(adminRoutes.routes);
+app.use(adminRoutes);
 app.use(shopRouter);
 
 app.use((req, res, next) => {
