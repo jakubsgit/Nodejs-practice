@@ -1,21 +1,45 @@
 const rootDir = require("../util/path");
 
-const products = [];
-
-exports.getAddProduct = (req, res, next) => {
-  //   res.sendFile(path.join(rootDir, "views", "add-product.html"));
-  res.render("add-product", { pageTitle: "Add product" });
-};
-
-exports.addNewProduct = (req, res, next) => {
-  if (req.body.title === "") {
-    res.redirect("/");
-  } else products.push({ title: req.body.title });
-  res.redirect("/");
-};
+const Product = require("../models/product");
 
 exports.getProducts = (req, res, next) => {
-  res.render("shop", { prods: products, pageTitle: "Shop", path: "/" });
+  Product.fetchAll(products => {
+    res.render("shop/shop", {
+      prods: products,
+      pageTitle: "Shop",
+      path: "/products",
+      active: true
+    });
+  });
 };
 
-exports.products = products;
+exports.getCart = (req, res, next) => {
+  res.render("shop/cart", {
+    pageTitle: "Cart",
+    path: "/cart",
+    active: true
+  });
+};
+
+exports.checkout = (req, res, next) => {
+  res.render("shop/checkout", {
+    pageTitle: "Checkout page",
+    path: "/checkout",
+    active: true
+  });
+};
+exports.products = (req, res, next) => {
+  res.render("shop/products", {
+    pageTitle: "All products",
+    path: "/products",
+    active: true
+  });
+};
+
+exports.getIndex = (req, res, next) => {
+  res.render("shop/index", {
+    pageTitle: "Index",
+    path: "/",
+    active: true
+  });
+};

@@ -6,10 +6,12 @@ const rootDir = require("../util/path");
 
 const router = express.Router();
 
-const productsController = require("../controllers/products");
+const adminController = require("../controllers/admin");
 
 // we can get another path to name them in Node.js file
-router.get("/add-product", productsController.getAddProduct);
-router.post("/", productsController.addNewProduct);
+router.get("/admin/add-product", adminController.getAddProduct);
+router.post("/admin/add-product", adminController.postAddProduct);
+// router for page with admin products
+router.get("/admin/products", adminController.getProducts);
 
 module.exports = router;
