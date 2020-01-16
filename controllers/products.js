@@ -67,11 +67,14 @@ exports.products = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  res.render("shop/index", {
-    pageTitle: "Index",
-    path: "/",
-    active: true,
-    admin: true,
-    all: true
+  Product.fetchAll(products => {
+    res.render("shop/index", {
+      prods: products,
+      pageTitle: "Main Page",
+      path: "/",
+      active: true,
+      admin: true,
+      all: true
+    });
   });
 };
