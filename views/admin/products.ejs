@@ -9,6 +9,41 @@
     </header>
 
     <main>
-        <h3> Admin page to see all products and edit them </h3>
+        <% if (prods.length > 0) { %>
+        <div class="grid">
+            <% for (let product of prods) {%>
+            <article class="card product-item">
+                <header class="card__header">
+                    <h1 class="product__title"><%= product.title %></h1>
+                </header>
+                <div class="card__image">
+                    <img src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" alt="A Book">
+                </div>
+                <div class="card__content">
+                    <h2 class="product__price">$<%= product.price %></h2>
+                    <p class="product__description"><%= product.description %>
+                    </p>
+                </div>
+                <div class="card__buttons">
+                    <div class="card__actions">
+                        <a href="/admin/edit-product" class="btn">Edit</a>
+                    </div>
+                    <div class="card__actions">
+                        <form action="/admin/delete-product" method="POST">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </article>
+            <% }  %>
+        </div>
+        <% } else { %>
+        <h3>No products</h3>
+        <% }  %>
     </main>
+    <script src="/js/main.js"></script>
 </body>
+
+</html>
