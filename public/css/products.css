@@ -4,7 +4,8 @@
 }
 
 .product-item {
-    width: 200px
+    width: 50px;
+    max-width: 100px !important
 }
 
 .product__title {
