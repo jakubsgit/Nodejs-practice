@@ -133,18 +133,14 @@ exports.products = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.findAll()
-    .then(products => {
-      res.render("shop/index", {
-        prods: products,
-        pageTitle: "Main Page",
-        path: "/",
-        active: true,
-        admin: true,
-        all: true
-      });
-    })
-    .catch(err => console.log(err));
+  res.render("shop/index", {
+    prods: "",
+    pageTitle: "Main Page",
+    path: "/",
+    active: true,
+    admin: true,
+    all: true
+  });
 };
 
 exports.postCreateOrder = (req, res, next) => {
@@ -172,7 +168,7 @@ exports.postCreateOrder = (req, res, next) => {
       return fetchedCart.setProducts(null);
     })
     .then(result => {
-      res.redirect("/cart");
+      res.redirect("/orders");
     })
     .catch(err => console.log(err));
 };
@@ -181,10 +177,14 @@ exports.getOrders = (req, res, next) => {
   req.user
     .getOrders({ include: ["products"] })
     .then(orders => {
+      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",
-        orders: orders
+        orders: orders,
+        active: true,
+        admin: false,
+        all: false
       });
     })
     .catch(err => console.log(err));

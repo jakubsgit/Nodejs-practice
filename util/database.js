@@ -1,9 +1,23 @@
-const Sequelize = require("sequelize");
 require("dotenv").config();
+const mongdb = require("mongodb");
 
-const sequelize = new Sequelize("nodejs", "root", process.env.PASSWORD, {
-  dialect: "mysql",
-  host: "localhost"
-});
+const MongoClient = mongdb.MongoClient;
 
-module.exports = sequelize;
+const mongoConnect = callback => {
+  MongoClient.connect(
+    `mongodb+srv://jakubsnode:kytne2-tuccut-hogceT@jakubsnode-ac2qp.mongodb.net/test?retryWrites=true&w=majority`,
+    {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    }
+  )
+    .then(client => {
+      console.log("Connnected");
+      callback(client);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+module.exports = mongoConnect;
