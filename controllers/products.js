@@ -172,7 +172,7 @@ exports.postCreateOrder = (req, res, next) => {
       return fetchedCart.setProducts(null);
     })
     .then(result => {
-      res.redirect("/orders");
+      res.redirect("/cart");
     })
     .catch(err => console.log(err));
 };
