@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../includes/head.js') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.js') %>
+    </header>
+
+    <main class="centered">
+        <h3><%= product.title %></h3>
+        <hr>
+        <div>
+            <img src="<%= product.image %>" alt="<%= product.title %>" />
+        </div>
+        <h3>Product details</h3>
+        <p><%= product.description %></p>
+        <div class="card__actions">
+            <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+        </div>
+    </main>
+    <script src="/js/main.js"></script>
+</body>
