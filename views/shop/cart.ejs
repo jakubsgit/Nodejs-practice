@@ -9,7 +9,21 @@
     </header>
 
     <main>
-        <h3> Cart </h3>
+        <% if (products.length > 0) { %>
+        <ul>
+            <% products.forEach(p => { %>
+            <li>
+                <p><%= p.productData.title %> (<%= p.qty %>)</p>
+                <form action="/cart-delete-item" method="POST">
+                    <input type="hidden" value="<%= p.productData.id %>" name="productId">
+                    <button class="btn" type="submit">Delete</button>
+                </form>
+            </li>
+            <% }) %>
+        </ul>
+        <% } else { %>
+        <h3>No Products in Cart!</h3>
+        <% } %>
     </main>
     <script src="/js/main.js"></script>
 </body>
