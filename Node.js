@@ -3,6 +3,8 @@ const path = require("path");
 
 const mongoConnect = require("./util/database").mongoConnect;
 
+const User = require("./models/user");
+
 const bodyParser = require("body-parser");
 const express = require("express");
 
@@ -17,14 +19,18 @@ const adminRoutes = require("./routes/admin");
 const shopRouter = require("./routes/shop");
 
 app.use((req, res, next) => {
-  //   User.findByPk(1)
-  //     .then(user => {
-  //       console.log(user);
-  //       req.user = user;
-  //       next();
-  //     })
-  //     .catch(err => console.log(err));
-  next();
+  User.findById("5e25ac4e1c9d44000094f4b8")
+    .then(user => {
+      console.log(user);
+      req.user = new User(
+        user.username,
+        user.email,
+        { ...user.cart },
+        user._id
+      );
+      next();
+    })
+    .catch(err => console.log(err));
 });
 
 app.use(bodyParser.urlencoded({ extended: false }));

@@ -1,14 +1,22 @@
-// const Sequelize = require("sequelize");
+const mongodb = require("mongodb");
 
-// const sequelize = require("../util/database");
+const getDb = require("../util/database").getDb;
 
-// const Cart = sequelize.define("cart", {
-//   id: {
-//     type: Sequelize.INTEGER,
-//     autoIncrement: true,
-//     allowNull: false,
-//     primaryKey: true
-//   }
-// });
+class Cart {
+  addToCart(product) {
+    // const cartProduct = this.cart.items.findIndex(cp => {
+    //   return cp._id === product.id;
+    // });
 
-// module.exports = Cart;
+    const updatedCart = { items: [{ ...product, quantity: 1 }] };
+    const db = getDb();
+    return db
+      .collection("users")
+      .updateOne(
+        { _id: new mongodb.ObjectId(this._id) },
+        { $set: { cart: updatedCart } }
+      );
+  }
+}
+
+module.exports = Cart;
