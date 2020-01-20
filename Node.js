@@ -1,12 +1,11 @@
 require("dotenv").config();
 const path = require("path");
 
-const mongoConnect = require("./util/database").mongoConnect;
-
 const User = require("./models/user");
 
 const bodyParser = require("body-parser");
 const express = require("express");
+const mongoose = require("mongoose");
 
 const app = express();
 
@@ -21,7 +20,6 @@ const shopRouter = require("./routes/shop");
 app.use((req, res, next) => {
   User.findById("5e25ac4e1c9d44000094f4b8")
     .then(user => {
-      console.log(user);
       req.user = new User(
         user.username,
         user.email,
@@ -41,6 +39,13 @@ app.use(adminRoutes);
 app.use(shopRouter);
 app.use(errorController.get404);
 
-mongoConnect(client => {
-  app.listen(3000);
-});
+mongoose
+  .connect(
+    `mongodb+srv://jakubsnode:${process.env.password}@jakubsnode-ac2qp.mongodb.net/test?retryWrites=true&w=majority`
+  )
+  .then(() => {
+    app.listen(3000);
+  })
+  .catch(err => {
+    console.log(err);
+  });

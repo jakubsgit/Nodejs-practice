@@ -114,7 +114,6 @@ class User {
           name: this.name,
           email: this.email
         };
-        console.log(this._id);
         return db.collection("orders").insertOne(order);
       })
       .then(() => {
