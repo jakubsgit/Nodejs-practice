@@ -5,7 +5,7 @@ const Cart = require("../models/cart");
 const Order = require("../models/order");
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
+  Product.fetchAll()
     .then(products => {
       res.render("shop/shop", {
         prods: products,
@@ -21,7 +21,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findByPk(prodId)
+  Product.findById(prodId)
     .then(product =>
       res.render("shop/details", {
         product: product,
