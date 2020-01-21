@@ -6,20 +6,17 @@ const rootDir = require("../util/path");
 
 const router = express.Router();
 
-const products = [];
+const adminController = require("../controllers/admin");
 
 // we can get another path to name them in Node.js file
-router.get("/add-product", (req, res, next) => {
-  //   res.sendFile(path.join(rootDir, "views", "add-product.html"));
-  res.render("add-product", { pageTitle: "Add product" });
-});
+router.get("/admin/add-product", adminController.getAddProduct);
+router.post("/admin/add-product", adminController.postAddProduct);
+// router for page with admin products
+router.get("/admin/products", adminController.getProducts);
 
-router.post("/", (req, res, next) => {
-  if (req.body.title === "") {
-    res.redirect("/");
-  } else products.push({ title: req.body.title });
-  res.redirect("/");
-});
+router.get("/admin/edit-product/:productId", adminController.getEditProduct);
+router.post("/admin/edit-product", adminController.postEditProduct);
 
-exports.routes = router;
-exports.products = products;
+router.post("/admin/delete-product", adminController.postDeleteProduct);
+
+module.exports = router;

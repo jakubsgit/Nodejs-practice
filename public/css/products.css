@@ -1,10 +1,18 @@
 .product-form {
-    width: 5rem;
+    width: 20rem;
+    max-width: 90%;
     margin: auto;
+    display: block;
 }
 
 .product-item {
-    width: 200px
+    width: 5rem !important;
+    max-width: 95%;
+    margin: 1rem;
+    display: felx;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .product__title {

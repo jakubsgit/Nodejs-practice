@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../includes/head.js') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.js') %>
+    </header>
+
+    <main>
+        <h3> Your Orders </h3>
+        <% if (orders.length <= 0) { %>
+        <h1>Nothing there!</h1>
+        <% } else { %>
+        <ul class="orders">
+            <% orders.forEach(order => { %>
+            <li class="orders__item">
+                <h3>Order - # <%= order._id %></h3>
+                <ul class="orders__products">
+                    <% order.products.forEach(p => { %>
+                    <li class="orders__products-item"><%= p.productData.title %> (<%= p.quantity %>)</li>
+                    <p class="orders__products-item"><%= p.productData.description %>
+                    </p>
+                    <% }); %>
+                </ul>
+            </li>
+            <% }); %>
+        </ul>
+        <% } %>
+    </main>
+    <script src="/js/main.js"></script>
+</body>
