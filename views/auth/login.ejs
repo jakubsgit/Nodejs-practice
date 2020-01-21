@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../includes/head.js') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.js') %>
+    </header>
+
+    <main>
+        <h3> The login page of our apllication</h3>
+
+        <form class="login-form" action="/login" method="POST">
+            <div class="form-control">
+                <label for="title">Name</label>
+                <input type="name" name="name" id="name">
+            </div>
+            <div class="form-control">
+                <label for="imageUrl">Email</label>
+                <input type="email" name="email" id="email">
+            </div>
+            <div class="form-control">
+                <label for="description">Password</label>
+                <input type="password" id="password" name="password" minlength="8" />
+            </div>
+            <button class="btn" type="submit">Login</button>
+        </form>
+    </main>
+    <script src="/js/main.js"></script>
+</body>
