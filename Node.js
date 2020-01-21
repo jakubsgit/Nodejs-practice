@@ -16,6 +16,7 @@ app.set("views", "views");
 
 const adminRoutes = require("./routes/admin");
 const shopRouter = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 app.use((req, res, next) => {
   User.findById("5e26c62e0b0c396fba3efe84")
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // We can write app.use('/admin', (adminRoutes)) to have path following by /admin
 app.use(adminRoutes);
 app.use(shopRouter);
+app.use(authRoutes);
 app.use(errorController.get404);
 
 mongoose
