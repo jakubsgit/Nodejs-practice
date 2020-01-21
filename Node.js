@@ -17,19 +17,19 @@ app.set("views", "views");
 const adminRoutes = require("./routes/admin");
 const shopRouter = require("./routes/shop");
 
-app.use((req, res, next) => {
-  User.findById("5e25ac4e1c9d44000094f4b8")
-    .then(user => {
-      req.user = new User(
-        user.username,
-        user.email,
-        { ...user.cart },
-        user._id
-      );
-      next();
-    })
-    .catch(err => console.log(err));
-});
+// app.use((req, res, next) => {
+//   User.findById("5e25ac4e1c9d44000094f4b8")
+//     .then(user => {
+//       req.user = new User(
+//         user.username,
+//         user.email,
+//         { ...user.cart },
+//         user._id
+//       );
+//       next();
+//     })
+//     .catch(err => console.log(err));
+// });
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -41,7 +41,11 @@ app.use(errorController.get404);
 
 mongoose
   .connect(
-    `mongodb+srv://jakubsnode:${process.env.password}@jakubsnode-ac2qp.mongodb.net/test?retryWrites=true&w=majority`
+    "mongodb+srv://jakubsnode:kytne2-tuccut-hogceT@jakubsnode-ac2qp.mongodb.net/test?retryWrites=true&w=majority",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
   )
   .then(() => {
     app.listen(3000);
