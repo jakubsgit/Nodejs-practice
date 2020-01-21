@@ -38,6 +38,23 @@ exports.postLogin = (req, res, next) => {
     })
     .catch(err => console.log(err));
 };
+exports.getSignup = (req, res, next) => {
+  res.render("auth/signup", {
+    pageTitle: "SIgnup",
+    path: "/signup",
+    admin: true,
+    all: false,
+    isAuthenticated: false
+  });
+};
+
+exports.postSignup = (req, res, next) => {
+  req.session.isLoggedIn = true;
+  req.session.save(err => {
+    console.log(err);
+    res.redirect("/");
+  });
+};
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy(err => {

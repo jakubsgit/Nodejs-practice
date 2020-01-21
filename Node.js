@@ -32,6 +32,7 @@ app.use(
     useUnifiedTopology: true,
     secret: "my secret",
     resave: true,
+    saveUninitialized: true,
     store: store
   })
 );
