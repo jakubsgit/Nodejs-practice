@@ -18,14 +18,13 @@ exports.postAddProduct = (req, res, next) => {
   const image = req.body.image;
   const description = req.body.description;
   const price = req.body.price;
-  const product = new Product(
-    title,
-    price,
-    image,
-    description,
-    null,
-    req.user._id
-  );
+  const product = new Product({
+    title: title,
+    image: image,
+    description: description,
+    price: price,
+    userId: req.user
+  });
   product
     .save()
     .then(result => {
@@ -47,21 +46,22 @@ exports.getEditProduct = (req, res, next) => {
       if (!product) {
         return res.redirect("/");
       }
+      console.log(product);
       res.render("admin/edit-product", {
         pageTitle: "Edit Product",
         path: "/admin/edit-product",
         admin: true,
         editing: editMode,
         product: product,
-        all: false,
-        product: product
+        all: false
       });
     })
     .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
+    .populate("userId")
     .then(products => {
       res.render("admin/products", {
         prods: products,
@@ -80,22 +80,21 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImage = req.body.image;
   const updatedDescription = req.body.description;
-  const product = new Product(
-    updatedTitle,
-    updatedPrice,
-    updatedImage,
-    updatedDescription,
-    new ObjectId(prodId)
-  );
-  product
-    .save()
+  Product.findById(prodId)
+    .then(product => {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.image = updatedImage;
+      product.description = updatedDescription;
+      return product.save();
+    })
     .then(() => res.redirect("/admin/products"))
     .catch(err => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, err) => {
   const prodId = req.body.productId;
-  Product.delete(prodId)
+  Product.findByIdAndRemove(prodId)
     .then(() => {
       res.redirect("/admin/products");
     })

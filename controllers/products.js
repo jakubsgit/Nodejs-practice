@@ -1,12 +1,10 @@
 const rootDir = require("../util/path");
 
 const Product = require("../models/product");
-const Cart = require("../models/cart");
 const Order = require("../models/order");
-const User = require("../models/user");
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       res.render("shop/shop", {
         prods: products,
@@ -35,6 +33,7 @@ exports.getProduct = (req, res, next) => {
     )
     .catch(err => console.log(err));
 };
+
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
@@ -87,12 +86,13 @@ exports.postCartDeleteItem = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then(products => {
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then(user => {
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
-        products: products,
+        products: user.cart.items,
         active: true,
         admin: false,
         all: false
@@ -133,18 +133,37 @@ exports.getIndex = (req, res, next) => {
 
 exports.postCreateOrder = (req, res, next) => {
   req.user
-    .addOrder()
-    .then(result => {
-      res.redirect("/cart");
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items.map(p => {
+        return {
+          quantity: p.quantity,
+          productData: { ...p.productId._doc }
+        };
+      });
+      const order = new Order({
+        user: {
+          name: user.name,
+          userId: user._id
+        },
+        products: products
+      });
+      return order.save();
     })
+    .then(result => {
+      return req.user.clearCart();
+    })
+    .then(() => res.redirect("/"))
     .catch(err => console.log(err));
 };
 
 exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders({ include: ["products"] })
+  Order.find({ "user.userId": req.user._id })
     .then(orders => {
-      console.log(orders);
+      const ord = orders.map(order => {
+        return order.products;
+      });
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",

@@ -13,13 +13,18 @@
         <a class="<%= path === '/cart' ? 'active' : '' %>  <%= admin && !all ? 'disable' : '' %>" href="/cart">Cart</a>
       </li>
       <li class="main-header__item">
-        <a class="<%= path === '/checkout' ? 'active' : '' %> <%= admin && !all ? 'disable' : '' %>" href="/checkout">Checkout</a>
+        <a class="<%= path === '/orders' ? 'active' : '' %> <%= admin && !all ? 'disable' : '' %>" href="/orders">Orders</a>
       </li>
-      <li class="main-header__item">
+      {/* <li class="main-header__item">
         <a class="<%= path === '/admin/add-product' ? 'active' : '' %>  <%= !admin ? 'disable' : '' %>" href="/admin/add-product">Add</a>
       </li>
       <li class="main-header__item">
         <a class="<%= path === '/admin/products' ? 'active' : '' %>  <%= !admin ? 'disable' : '' %>" href="/admin/products">Admin products</a>
+      </li> */}
+    </ul>
+    <ul class="main-header__item-list">
+      <li class="main-header__item">
+        <a href="/login">Login</a>
       </li>
     </ul>
   </nav>
