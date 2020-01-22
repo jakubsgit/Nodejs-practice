@@ -1,5 +1,5 @@
-const Product = require("../models/product");
-const mongodb = require("mongodb");
+const User = require("../models/user");
+const bcrypt = require("bcryptjs");
 
 exports.getAuth = (req, res, next) => {
   //   const isLoggedIn =
@@ -16,7 +16,6 @@ exports.getAuth = (req, res, next) => {
     isAuthenticated: false
   });
 };
-const User = require("../models/user");
 
 exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
@@ -49,11 +48,32 @@ exports.getSignup = (req, res, next) => {
 };
 
 exports.postSignup = (req, res, next) => {
-  req.session.isLoggedIn = true;
-  req.session.save(err => {
-    console.log(err);
-    res.redirect("/");
-  });
+  const name = req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+  User.findOne({ email: email })
+    .then(userDoc => {
+      if (userDoc) {
+        req.redirect("/signup");
+      }
+      return bcrypt.hash(password, 12);
+    })
+    .then(hashedPassword => {
+      const user = new User({
+        name: name,
+        email: email,
+        password: hashedPassword,
+        cart: { items: [] }
+      });
+      return user.save();
+    })
+    .then(result => {
+      res.redirect("/login");
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.postLogout = (req, res, next) => {
