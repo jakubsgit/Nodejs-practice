@@ -67,7 +67,13 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  let message = req.flash("editMessage");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  Product.find({ userId: req.user._id })
     .populate("userId")
     .then(products => {
       res.render("admin/products", {
@@ -77,7 +83,8 @@ exports.getProducts = (req, res, next) => {
         active: true,
         admin: true,
         all: false,
-        isAuthenticated: req.session.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn,
+        message: message
       });
     })
     .catch(err => console.log(err));
@@ -85,6 +92,7 @@ exports.getProducts = (req, res, next) => {
 
 //mongose is great by taking us some extra functions as having a product by ID
 exports.postEditProduct = (req, res, next) => {
+  const user = req.user;
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
@@ -92,6 +100,10 @@ exports.postEditProduct = (req, res, next) => {
   const updatedDescription = req.body.description;
   Product.findById(prodId)
     .then(product => {
+      if (product.userId !== user._id) {
+        req.flash("editMessage", "You can't edit this product");
+        return res.redirect("/products");
+      }
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.image = updatedImage;

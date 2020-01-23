@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 
+//for nodemailer we need to create transporter. For this example we can use great package taht is nodemailer-sendgrid-transport.
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
@@ -20,19 +21,17 @@ exports.getAuth = (req, res, next) => {
   } else {
     message = null;
   }
-  //   const isLoggedIn =
-  //     req
-  //       .get("Cookie")
-  //       .split(";")[0]
-  //       .trim()
-  //       .split("=")[1] == "true";
-  res.render("auth/login", {
-    pageTitle: "Login",
-    path: "/login",
-    admin: true,
-    all: false,
-    errorMessage: message
-  });
+  if (req.user) {
+    return res.redirect("/");
+  } else {
+    return res.render("auth/login", {
+      pageTitle: "Login",
+      path: "/login",
+      admin: true,
+      all: false,
+      errorMessage: message
+    });
+  }
 };
 
 //Here in login we can have our login data in requests body and check them if they match our cyrrent data of the user
@@ -107,7 +106,7 @@ exports.postSignup = (req, res, next) => {
         to: "jakubantczak.info@gmail.com",
         from: "shoppage@node.pl",
         subject: "You have succeeded signed up!",
-        html: `<h3>Great you did it ${name}! Your mail is ${email} and your password is ${password} </h3>`
+        html: `<h3>Great you did it ${name}! Your mail is ${email} and your password is ${password}. Please hide it from everyone</h3>`
       });
     })
     .catch(err => {
@@ -141,12 +140,16 @@ exports.getReset = (req, res, next) => {
     message: message
   });
 };
+
+//Here is the method to reset our password
 exports.postReset = (req, res, next) => {
+  //with crypto.randomBytes we can create token that we will be using thorugh out all reseting stages
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
       console.log(err);
       res.redirect("/login");
     }
+    //we need to convert aour token to hex build
     const token = buffer.toString("hex");
     User.findOne({ email: req.body.email })
       .then(user => {
@@ -167,7 +170,7 @@ exports.postReset = (req, res, next) => {
           "Check you mailbox to procceed with password changing"
         );
         res.redirect("/reset");
-
+        //with all setted up we can send an emial to our user witk link that contains token
         return transporter.sendMail({
           to: "jakubantczak.info@gmail.com",
           from: "shoppage@node.pl",
@@ -184,6 +187,7 @@ exports.postReset = (req, res, next) => {
 };
 
 exports.getPasswordChange = (req, res, next) => {
+  //in here if uswer used that link we can retrive it through params in the page and use it in form
   const token = req.params.token;
   res.render("auth/newPassword", {
     pageTitle: "Password change",
@@ -195,23 +199,27 @@ exports.getPasswordChange = (req, res, next) => {
 };
 
 exports.postPasswordChange = (req, res, next) => {
+  //once we recived token in body of the form we can use it
   const token = req.body.token.substr(1);
   const newPassword = req.body.password;
   let resetUser;
+  //we need to check if our user exist and also if token has not expired
   User.findOne({ resetToken: token, resetTokenExpire: { $gt: Date.now() } })
     .then(user => {
-      if (!user || user.resetTokenExpire.toString() < Date.now().toString()) {
+      if (!user) {
         req.flash(
           "resetMessage",
           "Your reset token expired. Please try once again to change it"
         );
         return res.redirect("/reset");
       }
+      //great idea is to store every data of our user in let object
       resetUser = user;
       return bcrypt.hash(newPassword, 12);
     })
     //always we need to remember to return some data from bcrypt because it returns us a hashedPassword that we an use
     .then(hashedPassword => {
+      //here we can use our resetuser to overwrite the data of normal user with the data that we recived from form of reset password page
       resetUser.password = hashedPassword;
       resetUser.token = undefined;
       resetUser.resetTokenExpire = undefined;
