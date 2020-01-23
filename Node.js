@@ -7,6 +7,7 @@ const csurf = require("csurf");
 const flash = require("connect-flash");
 
 const bodyParser = require("body-parser");
+const multer = require("multer");
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -14,6 +15,18 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
+
+//here we can specify how our files need to be goten.
+//In this case we specify destination to images folder and filename to filename-originalname.jpg
+//cb(error, functions)
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.filename + "-" + file.originalname);
+  }
+});
 
 //creating a session store in MongoDB
 const store = new MongoDBStore({
@@ -36,8 +49,12 @@ const authRoutes = require("./routes/auth");
 
 //Here we set up bodyparser to get some data that is retrive by requests in body
 //url encoded meand that we moslty parse some data in text
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
+//we can add multer to get data in the certain way
+//in dest we can configure location of the file that will be stored there
+app.use(multer({ dest: "images" }).single("image"));
 //serving static files in express
 app.use(express.static(path.join(__dirname, "public")));
 //setting up some session and naming store from Mongo

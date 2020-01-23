@@ -18,7 +18,8 @@ exports.getAddProduct = (req, res, next) => {
 //We can add some product that referes to some user by takin it it's ID and by parsing data from the form
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const image = req.body.image;
+  //we can get some file through multer in request and maka constant of it
+  const image = req.file;
   const description = req.body.description;
   const price = req.body.price;
   console.log(image);
