@@ -26,7 +26,7 @@
                 <label for="price">Price</label>
                 <input type="number" name="price" id="price">
             </div>
-
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>"></input>
             <button class="btn" type="submit">Add Product</button>
         </form>
     </main>

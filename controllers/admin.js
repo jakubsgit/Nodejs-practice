@@ -3,6 +3,7 @@ const mongodb = require("mongodb");
 
 const ObjectId = mongodb.ObjectId;
 
+//It sends us to the adding product page
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/add-product", {
     pageTitle: "Add product",
@@ -14,6 +15,7 @@ exports.getAddProduct = (req, res, next) => {
   });
 };
 
+//We can add some product that referes to some user by takin it it's ID and by parsing data from the form
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
   const image = req.body.image;
@@ -26,6 +28,8 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     userId: req.user._id
   });
+
+  //every time we can save some data to our DB we need to make promise on that by fireing save() fnction
   product
     .save()
     .then(result => {
@@ -36,11 +40,13 @@ exports.postAddProduct = (req, res, next) => {
     });
 };
 
+//Here we're having editmode that we retrive from hidden input
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect("/");
   }
+  //params we can have by adding them to the addres of the page for instance /edit-product:productId
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then(product => {
@@ -61,7 +67,13 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  let message = req.flash("editMessage");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  Product.find({ userId: req.user._id })
     .populate("userId")
     .then(products => {
       res.render("admin/products", {
@@ -71,12 +83,16 @@ exports.getProducts = (req, res, next) => {
         active: true,
         admin: true,
         all: false,
-        isAuthenticated: req.session.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn,
+        message: message
       });
     })
     .catch(err => console.log(err));
 };
+
+//mongose is great by taking us some extra functions as having a product by ID
 exports.postEditProduct = (req, res, next) => {
+  const user = req.user;
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
@@ -84,6 +100,10 @@ exports.postEditProduct = (req, res, next) => {
   const updatedDescription = req.body.description;
   Product.findById(prodId)
     .then(product => {
+      if (product.userId !== user._id) {
+        req.flash("editMessage", "You can't edit this product");
+        return res.redirect("/products");
+      }
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.image = updatedImage;
@@ -94,6 +114,7 @@ exports.postEditProduct = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+//Here we can delete some data from our database by searching them by ID. We need to remember that all mongoose finctions are promises.
 exports.postDeleteProduct = (req, res, err) => {
   const prodId = req.body.productId;
   Product.findByIdAndRemove(prodId)

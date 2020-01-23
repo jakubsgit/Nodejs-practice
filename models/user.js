@@ -11,11 +11,23 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  password: {
+    type: String,
+    required: true
+  },
+  resetToken: {
+    type: String,
+    required: false
+  },
+  resetTokenExpire: {
+    type: Date
+  },
   cart: {
     items: [
       {
         productId: {
           type: Schema.Types.ObjectId,
+          // We can name some references that our data will talk to
           ref: "Product",
           required: true
         },
@@ -25,6 +37,7 @@ const userSchema = new Schema({
   }
 });
 
+//creating schema methods for our DB schema
 userSchema.methods.addToCart = function(product) {
   const cartProductIndex = this.cart.items.findIndex(cp => {
     return cp.productId.toString() === product._id.toString();
@@ -68,6 +81,8 @@ userSchema.methods.deleteFromCart = function(productId) {
   this.cart = updatedCart;
   return this.save();
 };
+
+//taht shows us how easy is to manage some data from the data base. We need to refere to the this.OBJECT
 userSchema.methods.clearCart = function() {
   this.cart = { itmes: [] };
   return this.save();

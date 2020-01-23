@@ -4,6 +4,7 @@ exports.get404 = (req, res, next) => {
     pageTitle: "Page not found",
     path: "/404",
     admin: false,
+    //in every page we need to check if our user is logged in or not. Of course we can make it by creating some middleware
     isAuthenticated: req.session.isLoggedIn
   });
 };

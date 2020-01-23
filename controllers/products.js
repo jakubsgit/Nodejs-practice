@@ -3,6 +3,7 @@ const rootDir = require("../util/path");
 const Product = require("../models/product");
 const Order = require("../models/order");
 
+//find() function alows us to get all data from certain collection in our DB
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then(products => {
@@ -19,6 +20,7 @@ exports.getProducts = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+//Every time we receive prodId in the params. We need to remember about that.
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
   Product.findById(prodId)
@@ -36,6 +38,7 @@ exports.getProduct = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+//if we want to add some product to the cart we need to push him to the function taht we created in user models addToCart
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
@@ -75,6 +78,7 @@ exports.postCart = (req, res, next) => {
   //   })
 };
 
+//in user by making methods in models we can have them
 exports.postCartDeleteItem = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
@@ -91,6 +95,7 @@ exports.getCart = (req, res, next) => {
     .populate("cart.items.productId")
     .execPopulate()
     .then(user => {
+      //By populating some data from users collection we can have the data
       const products = user.cart.items;
       res.render("shop/cart", {
         path: "/cart",
@@ -103,26 +108,6 @@ exports.getCart = (req, res, next) => {
       });
     })
     .catch(err => console.log(err));
-};
-
-exports.getCheckout = (req, res, next) => {
-  res.render("shop/checkout", {
-    pageTitle: "Checkout page",
-    path: "/checkout",
-    active: true,
-    admin: false,
-    all: false
-  });
-};
-exports.products = (req, res, next) => {
-  res.render("shop/products", {
-    pageTitle: "All products",
-    path: "/products",
-    active: true,
-    admin: false,
-    all: false,
-    isAuthenticated: req.session.isLoggedIn
-  });
 };
 
 exports.getIndex = (req, res, next) => {
@@ -145,9 +130,11 @@ exports.postCreateOrder = (req, res, next) => {
       const products = user.cart.items.map(p => {
         return {
           quantity: p.quantity,
+          //MongoDB treats _doc like the method to have all data out of certain product
           productData: { ...p.productId._doc }
         };
       });
+      //If we want to have Orders collection in our db we need to add all porducts that we've made previuously and push them to the collection
       const order = new Order({
         user: {
           name: user.name,
