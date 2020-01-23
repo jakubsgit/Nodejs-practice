@@ -4,6 +4,7 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
+const { validationResult } = require("express-validator");
 
 //for nodemailer we need to create transporter. For this example we can use great package taht is nodemailer-sendgrid-transport.
 const transporter = nodemailer.createTransport(
@@ -29,7 +30,11 @@ exports.getAuth = (req, res, next) => {
       path: "/login",
       admin: true,
       all: false,
-      errorMessage: message
+      errorMessage: message,
+      input: {
+        email: "",
+        password: ""
+      }
     });
   }
 };
@@ -38,17 +43,39 @@ exports.getAuth = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const errors = validationResult(req);
+  //We need to transfer the user to login age if he doesn't exist
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/login", {
+      pageTitle: "Login",
+      path: "/login",
+      admin: true,
+      all: false,
+      errorMessage: errors.array()[0].msg,
+      input: {
+        email: email,
+        password: password
+      }
+    });
+  }
+
   User.findOne({ email: email })
     .then(user => {
-      //We need to transfer the user to login age if he doesn't exist
       if (!user) {
-        req.flash("error", "Invalid email or password.");
-        return res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          path: "/login",
+          pageTitle: "Login",
+          errorMessage: "Invalid email or password.",
+          input: {
+            email: email,
+            password: password
+          },
+          admin: true,
+          all: false
+        });
       }
-      //if exists we need to compare his password by encrypting it with bcrypt
       bcrypt
         .compare(password, user.password)
-        //it returns us promise eighter with false or true response
         .then(doMatch => {
           if (doMatch) {
             req.session.isLoggedIn = true;
@@ -58,7 +85,18 @@ exports.postLogin = (req, res, next) => {
               res.redirect("/");
             });
           }
-          res.redirect("/login");
+          return res.status(422).render("auth/login", {
+            path: "/login",
+            pageTitle: "Login",
+            input: {
+              email: email,
+              password: password
+            },
+            validationErrors: [],
+            errorMessage: "Nieprawidłowe hasło",
+            admin: true,
+            all: false
+          });
         })
         .catch(err => {
           console.log(err);
@@ -73,7 +111,13 @@ exports.getSignup = (req, res, next) => {
     pageTitle: "Signup",
     path: "/signup",
     admin: true,
-    all: false
+    all: false,
+    input: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
+    }
   });
 };
 
@@ -82,14 +126,24 @@ exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
-  User.findOne({ email: email })
-    .then(user => {
-      if (user) {
-        req.redirect("/signup");
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signup", {
+      pageTitle: "Signup",
+      path: "/signup",
+      admin: true,
+      all: false,
+      input: {
+        name: name,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword
       }
-      //every time if we return something in such a functions we need to proceed the promise. then()
-      return bcrypt.hash(password, 12);
-    })
+      //we can add errors: errors.array() to get all errors
+    });
+  }
+  bcrypt
+    .hash(password, 12)
     //here we have our crypted password and we can connect it to the certain user
     .then(hashedPassword => {
       const user = new User({
@@ -108,9 +162,6 @@ exports.postSignup = (req, res, next) => {
         subject: "You have succeeded signed up!",
         html: `<h3>Great you did it ${name}! Your mail is ${email} and your password is ${password}. Please hide it from everyone</h3>`
       });
-    })
-    .catch(err => {
-      console.log(err);
     })
     .catch(err => {
       console.log(err);

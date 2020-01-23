@@ -10,27 +10,28 @@
 
     <main>
         <h3>The SignUp page</h3>
-
         <form class="login-form" action="/signup" method="POST">
             <div class="form-control">
                 <label for="title">Name</label>
-                <input type="name" name="name" id="name">
+                <input type="name" name="name" id="name" value="<%= input.name %>"">
             </div>
-            <div class="form-control">
+            <div class=" form-control">
                 <label for="imageUrl">Email</label>
-                <input type="email" name="email" id="email">
+                <input type="email" name="email" id="email" value="<%= input.email %>">
             </div>
             <div class="form-control">
                 <label for="description">Password</label>
-                <input type="password" id="password" name="password" minlength="8" />
+                <input type="password" id="password" name="password" minlength="8" value="<%= input.password %>" />
             </div>
             <div class="form-control">
                 <label for="description">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" minlength="8" />
+                <input type="password" id="confirmPassword" name="confirmPassword"
+                    value="<%= input.confirmPassword %>" />
             </div>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>"></input>
             <button class="btn" type="submit">SignUp</button>
         </form>
+
     </main>
     <script src="/js/main.js"></script>
 </body>
