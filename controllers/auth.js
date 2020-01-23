@@ -157,7 +157,7 @@ exports.postSignup = (req, res, next) => {
     .then(result => {
       res.redirect("/login");
       return transporter.sendMail({
-        to: "jakubantczak.info@gmail.com",
+        to: email,
         from: "shoppage@node.pl",
         subject: "You have succeeded signed up!",
         html: `<h3>Great you did it ${name}! Your mail is ${email} and your password is ${password}. Please hide it from everyone</h3>`

@@ -1,4 +1,6 @@
 const rootDir = require("../util/path");
+const fs = require("fs");
+const path = require("path");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
@@ -107,7 +109,7 @@ exports.getCart = (req, res, next) => {
         all: false
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {});
 };
 
 exports.getIndex = (req, res, next) => {
@@ -147,7 +149,7 @@ exports.postCreateOrder = (req, res, next) => {
     .then(result => {
       return req.user.clearCart();
     })
-    .then(() => res.redirect("/"))
+    .then(() => res.redirect("/orders"))
     .catch(err => console.log(err));
 };
 
@@ -168,4 +170,40 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch(err => console.log(err));
+};
+
+exports.getInvoice = (req, res, next) => {
+  const user = req.user;
+  const orderId = req.params.orderId;
+
+  Order.findById(orderId)
+    .then(order => {
+      if (!order) {
+        return next(new Error("The invoice of this order can not be executed"));
+      }
+      if (order.user.userId.toString() !== user._id.toString()) {
+        return next(new Error("This invoice does not belong to the user"));
+      }
+      const fileName = `invoice.pdf`;
+      const invoicePath = path.join("data", "invoices", fileName);
+      const file = fs.createReadStream(invoicePath);
+      res.setHeader("ContentType", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + fileName + '"'
+      );
+      file.pipe(res);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+  // fs.readFile(invoicePath, (err, data) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  //   res.setHeader("ContentType", "application/pdf");
+  //   res.setHeader("Content-Disposition", 'inline; filename="' + fileName + '"');
+  //   res.send(data);
+  // });
 };

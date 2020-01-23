@@ -3,7 +3,7 @@ const path = require("path");
 
 const User = require("./models/user");
 
-const csurf = require("csurf");
+const csrf = require("csurf");
 const flash = require("connect-flash");
 
 const bodyParser = require("body-parser");
@@ -46,7 +46,7 @@ const store = new MongoDBStore({
   collection: "sessions"
 });
 
-const csurfProtection = csurf();
+const csrfProtection = csrf();
 
 const errorController = require("./controllers/error");
 //here we can setup views engine that is ejs in our project
@@ -84,7 +84,7 @@ app.use(
   })
 );
 //using csurf protection to get token from session
-app.use(csurfProtection);
+app.use(csrfProtection);
 //using flash to get data across components
 app.use(flash());
 
@@ -94,7 +94,6 @@ app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   next();
 });
-
 //setting req.user from database if already exists to retrive data much faster
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -102,16 +101,10 @@ app.use((req, res, next) => {
   }
   User.findById(req.session.user._id)
     .then(user => {
-      //we need to handle some errors if we won't find any user in data base
-      if (!user) {
-        return next();
-      }
       req.user = user;
       next();
     })
-    .catch(err => {
-      throw new Error(err);
-    });
+    .catch(err => console.log(err));
 });
 
 // We can write app.use('/admin', (adminRoutes)) to have path following by /admin
@@ -122,9 +115,9 @@ app.use("/500", errorController.get500);
 app.use(errorController.get404);
 
 //if we have some error our app is redirected to 500 page
-app.use((error, req, res, next) => {
-  res.redirect("/500");
-});
+// app.use((error, req, res, next) => {
+//   res.redirect("/500");
+// });
 //connectin whole app to MongoDB in addictional code we can create user in our DataBase if we have any
 mongoose
   .connect(

@@ -149,16 +149,12 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 //Here we can delete some data from our database by searching them by ID. We need to remember that all mongoose finctions are promises.
-exports.postDeleteProduct = (req, res, err) => {
+exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId)
+  Product.deleteOne({ _id: prodId, userId: req.user._id })
     .then(() => {
+      console.log("DESTROYED PRODUCT");
       res.redirect("/admin/products");
     })
-    .catch(err => {
-      console.log(err);
-      const error = err;
-      error.httpStatuCode = 500;
-      return next(error);
-    });
+    .catch(err => console.log(err));
 };
