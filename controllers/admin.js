@@ -11,7 +11,8 @@ exports.getAddProduct = (req, res, next) => {
     path: "/admin/add-product",
     admin: true,
     all: false,
-    isAuthenticated: req.session.isLoggedIn
+    isAuthenticated: req.session.isLoggedIn,
+    errorText: []
   });
 };
 
@@ -19,10 +20,21 @@ exports.getAddProduct = (req, res, next) => {
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
   //we can get some file through multer in request and maka constant of it
-  const image = req.file;
+  const imageInput = req.file;
   const description = req.body.description;
   const price = req.body.price;
-  console.log(image);
+  if (!imageInput) {
+    res.render("admin/add-product", {
+      pageTitle: "Add product",
+      active: true,
+      path: "/admin/add-product",
+      admin: true,
+      all: false,
+      isAuthenticated: req.session.isLoggedIn,
+      errorText: "The file was not upload correctly or it does not exist"
+    });
+  }
+  const image = imageInput.path;
   const product = new Product({
     title: title,
     image: image,
@@ -111,17 +123,19 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImage = req.body.image;
+  const image = req.file;
   const updatedDescription = req.body.description;
   Product.findById(prodId)
     .then(product => {
-      if (product.userId !== user._id) {
+      if (product.userId.toString() !== user._id.toString()) {
         req.flash("editMessage", "You can't edit this product");
-        return res.redirect("/products");
+        return res.redirect("/admin/products");
       }
       product.title = updatedTitle;
       product.price = updatedPrice;
-      product.image = updatedImage;
+      if (image) {
+        product.image = image.path;
+      }
       product.description = updatedDescription;
       return product.save();
     })

@@ -24,9 +24,21 @@ const fileStorage = multer.diskStorage({
     cb(null, "images");
   },
   filename: (req, file, cb) => {
-    cb(null, file.filename + "-" + file.originalname);
+    cb(null, file.originalname);
   }
 });
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/pdf" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  }
+  cb(null, false);
+};
 
 //creating a session store in MongoDB
 const store = new MongoDBStore({
@@ -54,8 +66,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //we can add multer to get data in the certain way
 //in dest we can configure location of the file that will be stored there
-app.use(multer({ dest: "images" }).single("image"));
-//serving static files in express
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+//serving static files in express and so we need to do for example with images
+//we need to point in witch file will be our images and then every request with /images will be get from that file
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(express.static(path.join(__dirname, "public")));
 //setting up some session and naming store from Mongo
 app.use(
