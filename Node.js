@@ -10,6 +10,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
+//we need to connect express-session to our mongodb-store
 const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
