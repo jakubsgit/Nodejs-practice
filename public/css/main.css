@@ -246,3 +246,25 @@ main a {
         display: none;
     }
 }
+
+.pagination {
+    text-align: center;
+    margin-top: 2rem
+}
+
+.pagination a {
+    text-decoration: none;
+    color: seagreen;
+    border: 1px solid seagreen;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 4px;
+    background-color: white;
+    transition: all 0.2s ease-in;
+}
+
+.pagination a:hover,
+.pagination a:active {
+    background-color: seagreen;
+    color: white
+}

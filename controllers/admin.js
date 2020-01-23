@@ -13,7 +13,12 @@ exports.getAddProduct = (req, res, next) => {
     admin: true,
     all: false,
     isAuthenticated: req.session.isLoggedIn,
-    errorText: []
+    errorText: [],
+    input: {
+      title: "",
+      description: "",
+      price: ""
+    }
   });
 };
 
@@ -32,7 +37,12 @@ exports.postAddProduct = (req, res, next) => {
       admin: true,
       all: false,
       isAuthenticated: req.session.isLoggedIn,
-      errorText: "The file was not upload correctly or it does not exist"
+      errorText: "The file was not upload correctly or it does not exist",
+      input: {
+        title: title,
+        description: description,
+        price: price
+      }
     });
   }
   const image = imageInput.path;
