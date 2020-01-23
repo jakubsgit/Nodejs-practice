@@ -3,10 +3,11 @@ const path = require("path");
 
 const User = require("./models/user");
 
-const csurf = require("csurf");
+const csrf = require("csurf");
 const flash = require("connect-flash");
 
 const bodyParser = require("body-parser");
+const multer = require("multer");
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -15,13 +16,37 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
 
+//here we can specify how our files need to be goten.
+//In this case we specify destination to images folder and filename to filename-originalname.jpg
+//cb(error, functions)
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/pdf" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  }
+  cb(null, false);
+};
+
 //creating a session store in MongoDB
 const store = new MongoDBStore({
   uri: `${process.env.MONGODB_URI}`,
   collection: "sessions"
 });
 
-const csurfProtection = csurf();
+const csrfProtection = csrf();
 
 const errorController = require("./controllers/error");
 //here we can setup views engine that is ejs in our project
@@ -36,9 +61,17 @@ const authRoutes = require("./routes/auth");
 
 //Here we set up bodyparser to get some data that is retrive by requests in body
 //url encoded meand that we moslty parse some data in text
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
-//serving static files in express
+//we can add multer to get data in the certain way
+//in dest we can configure location of the file that will be stored there
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+//serving static files in express and so we need to do for example with images
+//we need to point in witch file will be our images and then every request with /images will be get from that file
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(express.static(path.join(__dirname, "public")));
 //setting up some session and naming store from Mongo
 app.use(
@@ -51,7 +84,7 @@ app.use(
   })
 );
 //using csurf protection to get token from session
-app.use(csurfProtection);
+app.use(csrfProtection);
 //using flash to get data across components
 app.use(flash());
 
@@ -61,7 +94,6 @@ app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   next();
 });
-
 //setting req.user from database if already exists to retrive data much faster
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -69,16 +101,10 @@ app.use((req, res, next) => {
   }
   User.findById(req.session.user._id)
     .then(user => {
-      //we need to handle some errors if we won't find any user in data base
-      if (!user) {
-        return next();
-      }
       req.user = user;
       next();
     })
-    .catch(err => {
-      throw new Error(err);
-    });
+    .catch(err => console.log(err));
 });
 
 // We can write app.use('/admin', (adminRoutes)) to have path following by /admin
@@ -89,9 +115,9 @@ app.use("/500", errorController.get500);
 app.use(errorController.get404);
 
 //if we have some error our app is redirected to 500 page
-app.use((error, req, res, next) => {
-  res.redirect("/500");
-});
+// app.use((error, req, res, next) => {
+//   res.redirect("/500");
+// });
 //connectin whole app to MongoDB in addictional code we can create user in our DataBase if we have any
 mongoose
   .connect(

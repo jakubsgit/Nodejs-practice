@@ -1,6 +1,7 @@
 const Product = require("../models/product");
 const mongodb = require("mongodb");
 
+const deleteFile = require("../util/file").deleteFile;
 const ObjectId = mongodb.ObjectId;
 
 //It sends us to the adding product page
@@ -11,17 +12,30 @@ exports.getAddProduct = (req, res, next) => {
     path: "/admin/add-product",
     admin: true,
     all: false,
-    isAuthenticated: req.session.isLoggedIn
+    isAuthenticated: req.session.isLoggedIn,
+    errorText: []
   });
 };
 
 //We can add some product that referes to some user by takin it it's ID and by parsing data from the form
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const image = req.body.image;
+  //we can get some file through multer in request and maka constant of it
+  const imageInput = req.file;
   const description = req.body.description;
   const price = req.body.price;
-  console.log(image);
+  if (!imageInput) {
+    res.render("admin/add-product", {
+      pageTitle: "Add product",
+      active: true,
+      path: "/admin/add-product",
+      admin: true,
+      all: false,
+      isAuthenticated: req.session.isLoggedIn,
+      errorText: "The file was not upload correctly or it does not exist"
+    });
+  }
+  const image = imageInput.path;
   const product = new Product({
     title: title,
     image: image,
@@ -110,17 +124,19 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.productId;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImage = req.body.image;
+  const image = req.file;
   const updatedDescription = req.body.description;
   Product.findById(prodId)
     .then(product => {
-      if (product.userId !== user._id) {
+      if (product.userId.toString() !== user._id.toString()) {
         req.flash("editMessage", "You can't edit this product");
-        return res.redirect("/products");
+        return res.redirect("/admin/products");
       }
       product.title = updatedTitle;
       product.price = updatedPrice;
-      product.image = updatedImage;
+      if (image) {
+        product.image = image.path;
+      }
       product.description = updatedDescription;
       return product.save();
     })
@@ -134,16 +150,19 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 //Here we can delete some data from our database by searching them by ID. We need to remember that all mongoose finctions are promises.
-exports.postDeleteProduct = (req, res, err) => {
+exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId)
-    .then(() => {
-      res.redirect("/admin/products");
+  deleteFile;
+
+  Product.findOne({ _id: prodId, userId: req.user._id })
+    .then(prod => {
+      Product.deleteOne(prod)
+        .then(result => {
+          deleteFile(prod.image);
+          console.log(prod);
+          res.redirect("/admin/products");
+        })
+        .catch(err);
     })
-    .catch(err => {
-      console.log(err);
-      const error = err;
-      error.httpStatuCode = 500;
-      return next(error);
-    });
+    .catch(err => console.log(err));
 };
