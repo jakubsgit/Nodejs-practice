@@ -1,6 +1,7 @@
 const Product = require("../models/product");
 const mongodb = require("mongodb");
 
+const deleteFile = require("../util/file").deleteFile;
 const ObjectId = mongodb.ObjectId;
 
 //It sends us to the adding product page
@@ -151,10 +152,17 @@ exports.postEditProduct = (req, res, next) => {
 //Here we can delete some data from our database by searching them by ID. We need to remember that all mongoose finctions are promises.
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteOne({ _id: prodId, userId: req.user._id })
-    .then(() => {
-      console.log("DESTROYED PRODUCT");
-      res.redirect("/admin/products");
+  deleteFile;
+
+  Product.findOne({ _id: prodId, userId: req.user._id })
+    .then(prod => {
+      Product.deleteOne(prod)
+        .then(result => {
+          deleteFile(prod.image);
+          console.log(prod);
+          res.redirect("/admin/products");
+        })
+        .catch(err);
     })
     .catch(err => console.log(err));
 };
