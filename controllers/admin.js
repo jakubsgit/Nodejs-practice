@@ -21,6 +21,7 @@ exports.postAddProduct = (req, res, next) => {
   const image = req.body.image;
   const description = req.body.description;
   const price = req.body.price;
+  console.log(image);
   const product = new Product({
     title: title,
     image: image,
@@ -37,6 +38,9 @@ exports.postAddProduct = (req, res, next) => {
     })
     .catch(err => {
       console.log(err);
+      const error = err;
+      error.httpStatuCode = 500;
+      return next(error);
     });
 };
 
@@ -63,7 +67,12 @@ exports.getEditProduct = (req, res, next) => {
         isAuthenticated: req.session.isLoggedIn
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err);
+      const error = err;
+      error.httpStatuCode = 500;
+      return next(error);
+    });
 };
 
 exports.getProducts = (req, res, next) => {
@@ -87,7 +96,12 @@ exports.getProducts = (req, res, next) => {
         message: message
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err);
+      const error = err;
+      error.httpStatuCode = 500;
+      return next(error);
+    });
 };
 
 //mongose is great by taking us some extra functions as having a product by ID
@@ -111,7 +125,12 @@ exports.postEditProduct = (req, res, next) => {
       return product.save();
     })
     .then(() => res.redirect("/admin/products"))
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log(err);
+      const error = err;
+      error.httpStatuCode = 500;
+      return next(error);
+    });
 };
 
 //Here we can delete some data from our database by searching them by ID. We need to remember that all mongoose finctions are promises.
@@ -123,5 +142,8 @@ exports.postDeleteProduct = (req, res, err) => {
     })
     .catch(err => {
       console.log(err);
+      const error = err;
+      error.httpStatuCode = 500;
+      return next(error);
     });
 };

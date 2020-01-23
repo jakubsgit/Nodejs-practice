@@ -35,6 +35,7 @@ const shopRouter = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 
 //Here we set up bodyparser to get some data that is retrive by requests in body
+//url encoded meand that we moslty parse some data in text
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //serving static files in express
@@ -54,19 +55,6 @@ app.use(csurfProtection);
 //using flash to get data across components
 app.use(flash());
 
-//setting req.user from database if already exists to retrive data much faster
-app.use((req, res, next) => {
-  if (!req.session.user) {
-    return next();
-  }
-  User.findById(req.session.user._id)
-    .then(user => {
-      req.user = user;
-      next();
-    })
-    .catch(err => console.log(err));
-});
-
 //checking if crsf token matches our token of the session
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
@@ -74,12 +62,36 @@ app.use((req, res, next) => {
   next();
 });
 
+//setting req.user from database if already exists to retrive data much faster
+app.use((req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+    .then(user => {
+      //we need to handle some errors if we won't find any user in data base
+      if (!user) {
+        return next();
+      }
+      req.user = user;
+      next();
+    })
+    .catch(err => {
+      throw new Error(err);
+    });
+});
+
 // We can write app.use('/admin', (adminRoutes)) to have path following by /admin
 app.use(adminRoutes);
 app.use(shopRouter);
 app.use(authRoutes);
+app.use("/500", errorController.get500);
 app.use(errorController.get404);
 
+//if we have some error our app is redirected to 500 page
+app.use((error, req, res, next) => {
+  res.redirect("/500");
+});
 //connectin whole app to MongoDB in addictional code we can create user in our DataBase if we have any
 mongoose
   .connect(
