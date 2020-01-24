@@ -5,10 +5,20 @@ const PDFDocument = require("pdfkit");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
+const ITEMS_PER_PAGE = 2;
 
 //find() function alows us to get all data from certain collection in our DB
 exports.getProducts = (req, res, next) => {
+  const page = req.query.page;
+  let totalItems;
   Product.find()
+    .countDocuments()
+    .then(numProducts => {
+      totalItems = numProducts;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then(products => {
       res.render("shop/shop", {
         prods: products,
@@ -17,7 +27,13 @@ exports.getProducts = (req, res, next) => {
         active: true,
         admin: false,
         all: false,
-        isAuthenticated: req.session.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn,
+        currentPage: page,
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
       });
     })
     .catch(err => console.log(err));

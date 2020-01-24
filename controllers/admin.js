@@ -13,7 +13,12 @@ exports.getAddProduct = (req, res, next) => {
     admin: true,
     all: false,
     isAuthenticated: req.session.isLoggedIn,
-    errorText: []
+    errorText: [],
+    input: {
+      title: "",
+      description: "",
+      price: ""
+    }
   });
 };
 
@@ -32,7 +37,12 @@ exports.postAddProduct = (req, res, next) => {
       admin: true,
       all: false,
       isAuthenticated: req.session.isLoggedIn,
-      errorText: "The file was not upload correctly or it does not exist"
+      errorText: "The file was not upload correctly or it does not exist",
+      input: {
+        title: title,
+        description: description,
+        price: price
+      }
     });
   }
   const image = imageInput.path;
@@ -152,8 +162,6 @@ exports.postEditProduct = (req, res, next) => {
 //Here we can delete some data from our database by searching them by ID. We need to remember that all mongoose finctions are promises.
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  deleteFile;
-
   Product.findOne({ _id: prodId, userId: req.user._id })
     .then(prod => {
       Product.deleteOne(prod)
