@@ -8,6 +8,7 @@ const Order = require("../models/order");
 
 //find() function alows us to get all data from certain collection in our DB
 exports.getProducts = (req, res, next) => {
+  const page = req.query.page;
   Product.find()
     .then(products => {
       res.render("shop/shop", {
