@@ -23,6 +23,10 @@ router.get(
 );
 router.post("/admin/edit-product", isAuth, adminController.postEditProduct);
 
-router.post("/admin/delete-product", isAuth, adminController.postDeleteProduct);
+router.delete(
+  "/admin/delete-product/:productId",
+  isAuth,
+  adminController.deleteProduct
+);
 
 module.exports = router;

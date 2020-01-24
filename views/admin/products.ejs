@@ -32,14 +32,10 @@
                         <a href="/admin/edit-product/<%= product._id %>?edit=true" class="btn">Edit</a>
                     </div>
                     <div class="card__actions">
-                        <form class="product-form" action="/admin/delete-product" method="POST"
-                            enctype="multipart/form-data">
-                            <!-- We need to remember to add csrf tokens to our forms -->
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>"></input>
-                            <input type="hidden" name="productId" value="<%= product._id %>">
-                            <button class="btn" type="submit">Delete</button>
-                        </form>
-
+                        <!-- We need to remember to add csrf tokens to our forms -->
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>"></input>
+                        <input type="hidden" name="productId" value="<%= product._id %>">
+                        <button class="btn" type="submit" onClick="deleteProduct(this)">Delete</button>
                     </div>
                 </div>
 
@@ -51,6 +47,7 @@
         <% }  %>
     </main>
     <script src="/js/main.js"></script>
+    <script src="/js/admin.js"></script>
 </body>
 
 </html>

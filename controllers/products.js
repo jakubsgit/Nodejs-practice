@@ -3,6 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
 
+const stripe = require("stripe")("test_token");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 const ITEMS_PER_PAGE = 2;
@@ -187,6 +189,48 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch(err => console.log(err));
+};
+
+exports.getCheckout = (req, res, next) => {
+  let products;
+  const orderId = req.params.orderId;
+  console.log(orderId);
+  Order.find({ _id: orderId })
+    .then(orders => {
+      products = orders.map(order => {
+        return order.products[0];
+      });
+      console.log(products);
+      //   return stripe.session.create({
+      //     payment_method_types: ["card"],
+      //     line_items: products.map(p => {
+      //       return {
+      //         name: p.productData.title,
+      //         description: p.productData.description,
+      //         amount: p.productData.price * 100,
+      //         currency: "usd",
+      //         quantity: p.quantity
+      //       };
+      //     }),
+      //     success_url: "",
+      //     cancel_url: ""
+      //   });
+      // })
+      // .then(session => {
+      res.render("shop/checkout", {
+        path: "/checkout",
+        pageTitle: "Checkout page",
+        active: true,
+        products: products,
+        admin: false,
+        all: false,
+        isAuthenticated: req.session.isLoggedIn,
+        sessionId: session.id
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.getInvoice = (req, res, next) => {
