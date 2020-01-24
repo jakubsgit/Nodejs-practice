@@ -10,6 +10,19 @@
 
     <main>
         <h3> Checkout </h3>
+        <div class="centered ">
+            <button id="order-btn" class="button">GO TO PAYMENTS</button>
+            <script src></script>
+            <script>
+                const stripe = Stripe('');
+                const orderBtn = document.getElementById('order-btn');
+                orderBtn.addEventListener('click', () => {
+                    stripe.redirectToCheckout({
+
+                    })
+                })
+            </script>
+        </div>
     </main>
     <script src="/js/main.js"></script>
 </body>

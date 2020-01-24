@@ -189,6 +189,26 @@ exports.getOrders = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
+exports.getCheckout = (req, res, next) => {
+  const orderId = req.params.orderId;
+  console.log(orderId);
+  Order.find({ _id: orderId }).then(orders => {
+    const products = orders.map(order => {
+      return order.products;
+    });
+    console.log(products);
+    res.render("shop/checkout", {
+      path: "/checkout",
+      pageTitle: "Checkout page",
+      active: true,
+      products: products,
+      admin: false,
+      all: false,
+      isAuthenticated: req.session.isLoggedIn
+    });
+  });
+};
+
 exports.getInvoice = (req, res, next) => {
   const user = req.user;
   const orderId = req.params.orderId;

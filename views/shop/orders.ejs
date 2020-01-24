@@ -22,11 +22,17 @@
                     <li class="orders__products-item"><%= p.productData.title %> (<%= p.quantity %>)</li>
                     <p class="orders__products-item"><%= p.productData.description %>
                     </p>
+
+
+                    <% }); %>
                     <form action="/invoice/<%= order._id %>" method="GET">
                         <input type="hidden" value="<%= order._id %>" name="orderId">
                         <button class="btn" type="submit">Invoice</button>
                     </form>
-                    <% }); %>
+                    <form action="/checkout/<%= order._id %>" method="GET">
+                        <input type="hidden" value="<%= order._id %>" name="orderId">
+                        <button class="btn" type="submit">Pay now!</button>
+                    </form>
                 </ul>
             </li>
             <% }); %>
