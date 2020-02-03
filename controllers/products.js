@@ -224,8 +224,8 @@ exports.getCheckout = (req, res, next) => {
         products: products,
         admin: false,
         all: false,
-        isAuthenticated: req.session.isLoggedIn,
-        sessionId: session.id
+        isAuthenticated: req.session.isLoggedIn
+        // sessionId: session.id
       });
     })
     .catch(err => {
