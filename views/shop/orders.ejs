@@ -10,6 +10,34 @@
 
     <main>
         <h3> Your Orders </h3>
+        <% if (orders.length <= 0) { %>
+        <h1>Nothing there!</h1>
+        <% } else { %>
+        <ul class="orders">
+            <% orders.forEach(order => { %>
+            <li class="orders__item">
+                <h3>Order - # <%= order._id %></h3>
+                <ul class="orders__products">
+                    <% order.products.forEach(p => { %>
+                    <li class="orders__products-item"><%= p.productData.title %> (<%= p.quantity %>)</li>
+                    <p class="orders__products-item"><%= p.productData.description %>
+                    </p>
+
+
+                    <% }); %>
+                    <form action="/invoice/<%= order._id %>" method="GET">
+                        <input type="hidden" value="<%= order._id %>" name="orderId">
+                        <button class="btn" type="submit">Invoice</button>
+                    </form>
+                    <form action="/checkout/<%= order._id %>" method="GET">
+                        <input type="hidden" value="<%= order._id %>" name="orderId">
+                        <button class="btn" type="submit">Pay now!</button>
+                    </form>
+                </ul>
+            </li>
+            <% }); %>
+        </ul>
+        <% } %>
     </main>
     <script src="/js/main.js"></script>
 </body>

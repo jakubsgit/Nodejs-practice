@@ -17,7 +17,9 @@
         <h3>Product details</h3>
         <p><%= product.description %></p>
         <div class="card__actions">
+            <% if (isAuthenticated) { %>
             <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+            <% } %>
         </div>
     </main>
     <script src="/js/main.js"></script>

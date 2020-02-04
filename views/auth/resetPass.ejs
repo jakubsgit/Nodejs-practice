@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../includes/head.js') %>
+</head>
+
+<body>
+    <%- include('../includes/navigation.js') %>
+    </header>
+
+    <main>
+        <h3>The page to reset your password</h3>
+        <% if (message) { %>
+        <div class="user-message user-message--error"><%= message %></div>
+        <% } %>
+        <form class="login-form" action="/reset" method="POST">
+            <div class="form-control">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email">
+            </div>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>"></input>
+            <button class="btn" type="submit">Reset password</button>
+        </form>
+    </main>
+    <script src="/js/main.js"></script>
+</body>

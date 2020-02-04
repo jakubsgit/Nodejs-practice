@@ -13,16 +13,22 @@ body {
 main {
     padding: 1rem;
     margin: auto;
-
-}
-
-main .main ul {
-    list-style: none;
-    list-style-type: none;
 }
 
 form {
     display: inline;
+}
+
+.centered {
+    text-align: center;
+}
+
+.image {
+    height: 20rem;
+}
+
+.image img {
+    height: 100%;
 }
 
 .main-header {
@@ -34,10 +40,17 @@ form {
     align-items: center;
 }
 
+main a {
+    text-decoration: none;
+    color: #00695c;
+}
+
 .main-header__nav {
     height: 100%;
-    display: none;
+    width: 100%;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 
 .main-header__item-list {
@@ -52,14 +65,21 @@ form {
     padding: 0;
 }
 
-.main-header__item a {
+.main-header__item a,
+.main-header__item button {
+    font: inherit;
+    background: transparent;
+    border: none;
     text-decoration: none;
     color: white;
+    cursor: pointer;
 }
 
 .main-header__item a:hover,
 .main-header__item a:active,
-.main-header__item a.active {
+.main-header__item a.active,
+.main-header__item button:hover,
+.main-header__item button:active {
     color: #ffeb3b;
 }
 
@@ -151,7 +171,6 @@ form {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
     max-width: 20rem !important;
     max-height: 50rem !important;
-
 }
 
 .card__header,
@@ -199,13 +218,22 @@ form {
     background: white;
     border-radius: 3px;
     cursor: pointer;
-    transition: background-color 1s ease-in-out;
 }
 
 .btn:hover,
 .btn:active {
-    transition: background-color 1s ease-in-out;
     background-color: #00695c;
+    color: white;
+}
+
+.btn.danger {
+    color: red;
+    border-color: red;
+}
+
+.btn.danger:hover,
+.btn.danger:active {
+    background: red;
     color: white;
 }
 
@@ -219,10 +247,24 @@ form {
     }
 }
 
-.disable {
-    display: none
+.pagination {
+    text-align: center;
+    margin-top: 2rem
 }
 
-.centered {
-    text-align: center;
+.pagination a {
+    text-decoration: none;
+    color: seagreen;
+    border: 1px solid seagreen;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 4px;
+    background-color: white;
+    transition: all 0.2s ease-in;
+}
+
+.pagination a:hover,
+.pagination a:active {
+    background-color: seagreen;
+    color: white
 }

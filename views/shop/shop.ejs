@@ -17,7 +17,7 @@
                     <h1 class="product__title"><%= product.title %></h1>
                 </header>
                 <div class="card__image">
-                    <img src="https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png" alt="A Book">
+                    <img src="/<%= product.image %>" alt="<%= product.image %>">
                 </div>
                 <div class="card__content">
                     <h2 class="product__price">$<%= product.price %></h2>
@@ -25,9 +25,10 @@
                     </p>
                 </div>
                 <div class="card__actions">
-                    <a href="/product-details/<%= product.id %>" class="btn">Details</a>
+                    <a href="/product-details/<%= product._id %>" class="btn">Details</a>
+                    <% if (isAuthenticated) { %>
                     <%- include('../includes/add-to-cart.ejs', {product: product}) %>
-
+                    <% } %>
                 </div>
             </article>
             <% }  %>
@@ -35,6 +36,11 @@
         <% } else { %>
         <h3>No products</h3>
         <% }  %>
+
+        <section class="pagination">
+            <a href="products?page=1">1</a>
+            <a href="products?page=2">2</a>
+        </section>
     </main>
     <script src="/js/main.js"></script>
 </body>
