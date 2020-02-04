@@ -1,5 +1,6 @@
 require("dotenv").config();
 const path = require("path");
+const fs = require("fs");
 
 const User = require("./models/user");
 
@@ -11,6 +12,13 @@ const multer = require("multer");
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
+
+//compression and helmet feature
+const compression = require("compression");
+const helmet = require("helmet");
+
+//morgan for request logging
+const morgan = require("morgan");
 //we need to connect express-session to our mongodb-store
 const MongoDBStore = require("connect-mongodb-session")(session);
 
@@ -113,6 +121,20 @@ app.use(shopRouter);
 app.use(authRoutes);
 app.use("/500", errorController.get500);
 app.use(errorController.get404);
+
+//creating writeStream with node filesystem
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  {
+    flags: "a"
+  }
+);
+
+app.use(helmet());
+
+//most of host providers gives ous such a options straight away (compression)
+app.use(compression());
+app.use(morgan("combined", { stream: accessLogStream }));
 
 //if we have some error our app is redirected to 500 page
 // app.use((error, req, res, next) => {

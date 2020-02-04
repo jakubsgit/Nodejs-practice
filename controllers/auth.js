@@ -200,10 +200,12 @@ exports.postReset = (req, res, next) => {
       console.log(err);
       res.redirect("/login");
     }
-    //we need to convert aour token to hex build
+    const email = req.body.email;
+    //we need to convert our token to hex build
     const token = buffer.toString("hex");
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: email })
       .then(user => {
+        console.log(user);
         if (!user) {
           req.flash(
             "resetMessage",
